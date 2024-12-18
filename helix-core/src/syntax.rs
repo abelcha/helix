@@ -973,6 +973,23 @@ impl Loader {
         // TODO: content_regex handling conflict resolution
     }
 
+    pub fn language_config_for_modline(
+        &self,
+        source: RopeSlice,
+    ) -> Option<Arc<LanguageConfiguration>> {
+        const MODLINE: &str = r#"^(#|//)\s*(hx|helix):\s*(ft|filetype|lang|language)=(?<lang>\w+)"#;
+        static MODLINE_REGEX: Lazy<Regex> =
+            Lazy::new(|| Regex::new(&["^", MODLINE].concat()).unwrap());
+        source
+            .slice(..std::cmp::min(100, source.len_chars() - 1))
+            .lines()
+            .find_map(|line| {
+                MODLINE_REGEX
+                    .captures(&Cow::from(line))
+                    .and_then(|cap| self.language_config_for_name(&cap.name("lang")?.as_str()))
+            })
+    }
+
     pub fn language_config_for_shebang(
         &self,
         source: RopeSlice,

@@ -1065,6 +1065,7 @@ impl Document {
     ) -> Option<Arc<helix_core::syntax::LanguageConfiguration>> {
         config_loader
             .language_config_for_file_name(self.path.as_ref()?)
+            .or_else(|| config_loader.language_config_for_modline(self.text().slice(..)))
             .or_else(|| config_loader.language_config_for_shebang(self.text().slice(..)))
     }
 
