@@ -977,6 +977,9 @@ impl Loader {
         &self,
         source: RopeSlice,
     ) -> Option<Arc<LanguageConfiguration>> {
+        // find a vi-like modline in the first 100 chars
+        // eg:
+        // helix: language=rust
         const MODLINE: &str = r#"^(#|//)\s*(hx|helix):\s*(ft|filetype|lang|language)=(?<lang>\w+)"#;
         static MODLINE_REGEX: Lazy<Regex> =
             Lazy::new(|| Regex::new(&["^", MODLINE].concat()).unwrap());
